@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./", // Updated to include the root directory
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["index.ts", "src/**/*.ts"], // Include the root index.ts and src directory
+  "exclude": ["node_modules"]
+}
