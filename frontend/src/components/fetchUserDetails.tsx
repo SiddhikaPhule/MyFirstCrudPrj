@@ -1,6 +1,9 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 function FetchUserData() {
     const [tasks, setTasks] = useState<any[]>([])
     const[error, setError]= useState<string |null>(null)
@@ -8,7 +11,7 @@ function FetchUserData() {
     useEffect(() => {
         const fetchTask = async () => {
             try{
-                const response = await axios.get('http://localhost:3000/api/tasks')
+                const response = await axios.get(`${BASE_URL}/tasks`)
                 setTasks(response.data)
             }catch(err: any){
                 setError('failed to fetch data')
@@ -21,7 +24,7 @@ function FetchUserData() {
     const handleDelete = async (id: string) => {
         console.log(`Attempting to delete task with ID: ${id}`);
         try {
-            const response = await axios.delete(`http://localhost:3000/api/tasks/${id}`);
+            const response = await axios.delete(`${BASE_URL}/tasks/${id}`);
             console.log('Delete response:', response.data);
             setTasks(tasks.filter(task => task._id !== id));
         } catch (err: any) {
@@ -37,7 +40,7 @@ function FetchUserData() {
         const [title, description] = updatedTask.split(',');
 
         try {
-            await axios.put(`http://localhost:3000/api/tasks/${id}`, { title, description });
+            await axios.put(`${BASE_URL}/tasks/${id}`, { title, description });
             setTasks(tasks.map(task => task._id === id ? { ...task, title, description } : task));
         } catch (err: any) {
             console.error('Failed to update task:', err);

@@ -2,6 +2,9 @@ import React from 'react'
 import { useState } from 'react';
 import axios from 'axios';
 
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 function AddUserDetails() {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
@@ -13,7 +16,7 @@ function AddUserDetails() {
         setError(null);
 
         try {
-            const response = await axios.post("http://localhost:3000/api/addUser", { title, description, status })
+            const response = await axios.post(`${BASE_URL}/addUser`, { title, description, status })
             console.log("user Creted", response.data)
             alert(" data inserted successfully")
             setTitle('')
@@ -32,7 +35,7 @@ function AddUserDetails() {
             <div id='formElement'>
                 <form onSubmit={handleSubmit}>
                     <label htmlFor='title'>Title</label>
-                    <input id='title' placeholder='Enter title' value={title} onChange={(e) => setTitle(e.target.value)} required/>
+                    <input id='title' placeholder='Enter title' value={title} onChange={(e) => setTitle(e.target.value)} />
                     <br></br><br></br>
                     <label htmlFor="description">Description</label>
                     <textarea id='description' placeholder='Enter your text here' value={description} onChange={(e) => setDescription(e.target.value)} />
