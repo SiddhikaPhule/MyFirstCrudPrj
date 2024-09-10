@@ -7,6 +7,7 @@ export const createUser = async (req:Request, res:Response, next:NextFunction) =
         const{title, description, status } = req.body
 
         if(!title || !description || !status){
+
             const cutomeError = new ErrorHandler(400, 'filled the required details before proceeding further')
             return  res.status(cutomeError.status || 500).json({
                 success: false,
@@ -29,6 +30,7 @@ export const createUser = async (req:Request, res:Response, next:NextFunction) =
         })
     }
     catch(error){
+        console.log(error)
         const cutomeError = new ErrorHandler(400, 'filled the required details before proceeding further')
         return  res.status(cutomeError.status || 500).json({
             success: false,

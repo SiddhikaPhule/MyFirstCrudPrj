@@ -1,56 +1,58 @@
 import express from "express";
 import mongoose from "mongoose";
-import 'dotenv/config'
-import cors from 'cors'
+import 'dotenv/config';
+import cors from 'cors';
 import { Request, Response, NextFunction } from "express";
-import {ensureConnection} from './models/userModel'
-import router from './routes/userRoutes'
-import {loggerMiddleware} from './middlewares/generalMiddleware'
-import {ErrorHandler} from './errorHandlers/errorhandle';
+import { ensureConnection } from './models/userModel';
+import router from './routes/userRoutes';
+import { loggerMiddleware } from './middlewares/generalMiddleware';
+import { ErrorHandler } from './errorHandlers/errorhandle';
+import { auth } from './middlewares/authMiddleaware';
+import jwt from "jsonwebtoken";
 
-const{PORT, ENV_NAME, MONGO_URL} = process.env
+const { PORT, ENV_NAME, MONGO_URL, JWT_SECRET_KEY } = process.env;
+const secret = JWT_SECRET_KEY || 'your-secret-key';
 const app = express();
 const port = PORT || 3000;
-const dburi:string = MONGO_URL as string;
+const dburi: string = MONGO_URL as string;
 
-//making connection with db
-const connetDB =async () => {
-    try{
-        await mongoose.connect(dburi);  
-            console.log("connected with mongoDB successfully");
-            await ensureConnection();
-
-    }catch(error){
-        console.log('Error occor while connection with db', error)
+// Connect to MongoDB
+const connectDB = async () => {
+    try {
+        await mongoose.connect(dburi);
+        console.log("Connected with MongoDB successfully");
+        await ensureConnection();
+    } catch (error) {
+        console.log('Error occurred while connecting with DB', error);
         process.exit(1);
     }
- }
+};
 
-//calling db
-connetDB();
+connectDB();
 
-app.use(express.json())
+app.use(express.json());
 app.use(cors());
 
-//error handling middleware
-
-// app.use((err:any, req:Request, res:Response, next:NextFunction) => {
-//     let {status= 500, msg="Something went wrong"} = err;
-//     res.status(status).send(msg);
-// })
-
+// Logger Middleware
 app.use(loggerMiddleware);
 
-app.use('/api', router)
+// Token Generation Route
+app.get('/api/token', (req: Request, res: Response) => {
+    const token = jwt.sign({ user: 'testUser' }, secret, { expiresIn: '1h' });
+    console.log('Generated Token:', token);
+    res.json({ token });
+});
 
-//Test call
+// Authenticated Routes
+app.use('/api', auth, router);
+
+// Test Route
 app.get('/test', (req: Request, res: Response) => {
     res.status(200).send(`Test API is working fine on port: ${port}`);
-}); 
+});
 
-// Error handling 
+// Error Handling Middleware
 app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-    console.log("error arrived")
     console.error(err);
 
     res.status(err.status || 500).json({
@@ -59,8 +61,7 @@ app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => 
     });
 });
 
-
-//Initializing
+// Start Server
 app.listen(port, () => {
-    console.log(`server is listening on ${port} : ${ENV_NAME}`);
-})
+    console.log(`Server is listening on ${port} : ${ENV_NAME}`);
+});
