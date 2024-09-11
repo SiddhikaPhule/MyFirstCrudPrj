@@ -4,7 +4,11 @@ import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-function AddUserDetails() {
+interface AddUserDetailsProps {
+    onDataAdded: () => void;
+}
+
+function AddUserDetails({ onDataAdded }: AddUserDetailsProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('to do');
@@ -13,6 +17,7 @@ function AddUserDetails() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
+
 
         try {
             // Retrieve the token from localStorage
@@ -36,6 +41,7 @@ function AddUserDetails() {
             setTitle('');
             setDescription('');
             setStatus('to do');
+            onDataAdded(); // Notify parent to refetch data
         } catch (err: any) {
             setError('Failed to add user');
             console.error(err);

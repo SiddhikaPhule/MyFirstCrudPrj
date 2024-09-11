@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     status: { 
         type: String,
         enum: ['to do', 'pending', 'completed'],
-        default: 'to do',
         required: true 
     }
 

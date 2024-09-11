@@ -13,7 +13,7 @@ import jwt from "jsonwebtoken";
 const { PORT, ENV_NAME, MONGO_URL, JWT_SECRET_KEY } = process.env;
 const secret = JWT_SECRET_KEY || 'your-secret-key';
 const app = express();
-const port = PORT || 3000;
+const port = PORT || 3001;
 const dburi: string = MONGO_URL as string;
 
 // Connect to MongoDB

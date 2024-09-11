@@ -25,3 +25,22 @@ export const getTask = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'An error occurred while fetching tasks' });
   }
 };
+
+export const updateBulkTask = async (req: Request, res: Response) => {
+  try {
+    const { filter, updateFields } = req.body;
+
+    if (!filter || !updateFields) {
+      return res.status(400).json({ error: 'Filter and updateFields are required' });
+    }
+
+    const result = await userModel.updateMany(filter, updateFields);
+
+    res.status(200).json({
+      modifiedCount: result.modifiedCount,
+      message: `${result.modifiedCount} tasks were updated successfully`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred during the bulk update' });
+  }
+};

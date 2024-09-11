@@ -9,9 +9,13 @@ interface Task {
     status: string;
 }
 
+interface FetchUserDetailsProps {
+    shouldFetch: boolean;
+}
+
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-function FetchUserData() {
+function FetchUserData({ shouldFetch }: FetchUserDetailsProps) {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1); //current page
@@ -47,7 +51,7 @@ function FetchUserData() {
 
     useEffect(() => {
         fetchTasks(currentPage);
-    }, [currentPage]);
+    }, [shouldFetch, currentPage]);
 
     const handleDelete = async (id: string) => {
         try {
@@ -55,8 +59,13 @@ function FetchUserData() {
             await axios.delete(`${BASE_URL}/tasks/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                }
+                } 
             });
+             if (tasks.length === 1 && currentPage > 1) {
+                setCurrentPage(currentPage - 1);
+            } else {
+                fetchTasks(currentPage);
+            }
             setTasks(tasks.filter(task => task._id !== id));
         } catch (err: any) {
             console.error('Failed to delete task:', err);
@@ -65,10 +74,10 @@ function FetchUserData() {
     };
 
     const handleUpdate = async (id: string) => {
-        const updatedTask = prompt('Enter new title and description (comma-separated):');
+        const updatedTask = prompt('Enter new title, description and status (comma-separated):');
         if (!updatedTask) return;
 
-        const [title, description] = updatedTask.split(',');
+        const [title, description, status] = updatedTask.split(',');
 
         try {
             const token = localStorage.getItem('authToken');
@@ -77,7 +86,7 @@ function FetchUserData() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setTasks(tasks.map(task => task._id === id ? { ...task, title, description } : task));
+            setTasks(tasks.map(task => task._id === id ? { ...task, title, description,status } : task));
         } catch (err: any) {
             console.error('Failed to update task:', err);
         }
@@ -125,9 +134,9 @@ function FetchUserData() {
                 </tbody>
             </table>
             <br />
-            <button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</button>
+            <button onClick={handlePreviousPage} disabled={currentPage === 1}> &laquo; Previous</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next &raquo;</button>
         </div>
     );
 }
